@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Java Script Editor"
+            extensions="js"
+            icon="icons/sample.gif"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            class="jsedit.editors.JavaScriptEditor"
+            id="jsedit.editors.JavaScriptEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant class="jsedit.editors.JavaScriptDocumentParticipant"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.documentProviders">
+      <provider
+            class="jsedit.editors.JavaScriptDocumentProvider"
+            extensions="js"
+            id="jsedit.editors.JavaScriptDocumentProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.annotationModelCreation">
+      <factory
+            class="jsedit.editors.JavaScriptAnnotationModelFactory"
+            extensions="js">
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="jsedit.JavaScriptLabelDecorator"
+            icon="src/jsedit/checkout.gif"
+            id="JSEdit.JavaScriptDecorator"
+            label="Java Script Image Decorator"
+            objectClass="org.eclipse.core.resources.IFile"
+            state="false">
+            <description>
+           		The Label Decorator JavaScript Files
+            </description>
+      </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="jsedit.JavaScriptPreferencePage"
+            id="JSEdit.JavaScriptEditorPreferenecePage"
+            name="Java Script Preference Page">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="jsedit.JavaScriptPropertyPage"
+            id="JSEdit.JavaScriptPropertyPage"
+            name="Java Script Property Page"
+            nameFilter="*.js">
+            <enabledWhen>
+            	<instanceof
+                   value="org.eclipse.core.resources.IFile">
+            	</instanceof>
+            </enabledWhen>
+      </page>
+   </extension>
+
+</plugin>
