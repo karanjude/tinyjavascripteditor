@@ -1,5 +1,6 @@
 package jsedit.editors;
 
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,12 +12,21 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.ISourceReference;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaSourceViewer;
+import org.eclipse.jdt.ui.actions.IJavaEditorActionDefinitionIds;
+import org.eclipse.jdt.ui.text.IJavaPartitions;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.swt.SWT;
@@ -27,17 +37,22 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.ContentAssistAction;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
+import org.eclipse.ui.texteditor.IUpdate;
 import org.eclipse.ui.texteditor.TextOperationAction;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Parser;
+import org.mozilla.javascript.ScriptOrFnNode;
 
 public class JavaScriptEditor extends TextEditor implements ErrorReporter {
 
 	private ColorManager colorManager;
 	private IDocument document;
 	String CONTENT_ASSIST_PROPOSALS= "jsedit.contentAssist.proposals";
+	private JavaScriptContentOutlinePage outlinePage;
+	private ScriptOrFnNode model;
 	
 	public JavaScriptEditor() {
 		super();
@@ -53,7 +68,6 @@ public class JavaScriptEditor extends TextEditor implements ErrorReporter {
 		IAction contentAssistAction = new TextOperationAction(JavaScriptEditorMessages.getResourceBundle(),"ContentAssistProposal.",this,ISourceViewer.CONTENTASSIST_PROPOSALS);
 		contentAssistAction.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
 		setAction("ContentAssistProposal", contentAssistAction);
-	
 	}
 
 	public void dispose() {
@@ -69,10 +83,12 @@ public class JavaScriptEditor extends TextEditor implements ErrorReporter {
 		setSourceViewerConfiguration(new JavaScriptSourceViewerCoinfiguration(new ColorManager(),this));
 		
 	
-		///eJavaScriptSourceViewerCoinfiguration javaScriptSourceViewerCoinfiguration = new JavaScriptSourceViewerCoinfiguration();
-		//setSourceViewerConfiguration(javaScriptSourceViewerCoinfiguration);
-	//	getSourceViewer().configure(javaScriptSourceViewerCoinfiguration);
-		//System.out.println(JavaScriptEditorPlugin.getDefault().getDocument().get());
+		// /eJavaScriptSourceViewerCoinfiguration
+		// javaScriptSourceViewerCoinfiguration = new
+		// JavaScriptSourceViewerCoinfiguration();
+		// setSourceViewerConfiguration(javaScriptSourceViewerCoinfiguration);
+	// getSourceViewer().configure(javaScriptSourceViewerCoinfiguration);
+		// System.out.println(JavaScriptEditorPlugin.getDefault().getDocument().get());
 		System.out.println("initializeinf editor");	
 	}
 	
@@ -82,58 +98,59 @@ public class JavaScriptEditor extends TextEditor implements ErrorReporter {
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		super.init(site, input);
-//		final IEditorInput myinput = input;
-//		IAnnotationModel annotationModel = getDocumentProvider().getAnnotationModel(input);
-//		annotationModel.addAnnotationModelListener(new IAnnotationModelListener(){
+// final IEditorInput myinput = input;
+// IAnnotationModel annotationModel =
+// getDocumentProvider().getAnnotationModel(input);
+// annotationModel.addAnnotationModelListener(new IAnnotationModelListener(){
 //
-//			public void modelChanged(IAnnotationModel model) {
-//				final IResource resource = (IResource) myinput.getAdapter(IResource.class);
-//				int loff = 0;
-//				int dd = 0;
-//				try {
+// public void modelChanged(IAnnotationModel model) {
+// final IResource resource = (IResource) myinput.getAdapter(IResource.class);
+// int loff = 0;
+// int dd = 0;
+// try {
 //					
-//					 loff = JavaScriptEditorPlugin.getDefault().getDocument().getLineOffset(2) ;
-//					  dd = JavaScriptEditorPlugin.getDefault().getDocument().getLineOffset(2);
-//				} catch (BadLocationException e1) {
-//					// 
-//					e1.printStackTrace();
-//				}
-//				 final Map<String, Object> map = new HashMap<String, Object>();
-//		            map.put(IMarker.MESSAGE, "problem");
-//		            map.put(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
-//		            map.put(IMarker.LINE_NUMBER, 2);
-//		            map.put(IMarker.CHAR_START,dd + 3);  
-//		            map.put(IMarker.CHAR_END, dd + 5);
-//		            map.put(IMarker.TRANSIENT, Boolean.valueOf(true));
+// loff = JavaScriptEditorPlugin.getDefault().getDocument().getLineOffset(2) ;
+// dd = JavaScriptEditorPlugin.getDefault().getDocument().getLineOffset(2);
+// } catch (BadLocationException e1) {
+// //
+// e1.printStackTrace();
+// }
+// final Map<String, Object> map = new HashMap<String, Object>();
+// map.put(IMarker.MESSAGE, "problem");
+// map.put(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
+// map.put(IMarker.LINE_NUMBER, 2);
+// map.put(IMarker.CHAR_START,dd + 3);
+// map.put(IMarker.CHAR_END, dd + 5);
+// map.put(IMarker.TRANSIENT, Boolean.valueOf(true));
 //		            
-//		        	IWorkspaceRunnable r= new IWorkspaceRunnable() {
-//		    			public void run(IProgressMonitor monitor) throws CoreException {
-//		    				IMarker marker= resource.createMarker(IMarker.PROBLEM);
-//		    				marker.setAttributes(map);
-//		    			}
-//		    		};
+// IWorkspaceRunnable r= new IWorkspaceRunnable() {
+// public void run(IProgressMonitor monitor) throws CoreException {
+// IMarker marker= resource.createMarker(IMarker.PROBLEM);
+// marker.setAttributes(map);
+// }
+// };
 //
-//		    		try {
-//		    			if(!resource.getWorkspace().isTreeLocked() )
-//		    				resource.getWorkspace().run(r, null,IWorkspace.AVOID_UPDATE, null);
-//					} catch (CoreException e) {
-//						e.printStackTrace();
-//					}
+// try {
+// if(!resource.getWorkspace().isTreeLocked() )
+// resource.getWorkspace().run(r, null,IWorkspace.AVOID_UPDATE, null);
+// } catch (CoreException e) {
+// e.printStackTrace();
+// }
 //
-//			}
+// }
 //			
-//		});
-		//		System.out.println("document created" +
-//				"");
-//		IDocument document2 = JavaScriptEditorPlugin.getDefault().getDocument();
-//		document2.addDocumentListener(new IDocumentListener(){
+// });
+		// System.out.println("document created" +
+// "");
+// IDocument document2 = JavaScriptEditorPlugin.getDefault().getDocument();
+// document2.addDocumentListener(new IDocumentListener(){
 //
-//			public void documentAboutToBeChanged(DocumentEvent event) {
-//			}
+// public void documentAboutToBeChanged(DocumentEvent event) {
+// }
 //
-//			public void documentChanged(DocumentEvent event) {
-//			}
-//		});
+// public void documentChanged(DocumentEvent event) {
+// }
+// });
 	}
 
 	@Override
@@ -145,19 +162,24 @@ public class JavaScriptEditor extends TextEditor implements ErrorReporter {
 
 	@Override
 	public boolean isDirty() {
-//		JavaScriptScanner partitionScanner = JavaScriptEditorPlugin.getDefault().getPartitionScanner();
-//		IDocumentPartitioner javaScriptDocumentPartitioner = JavaScriptEditorPlugin.getDefault().getJavaScriptDocumentPartitioner();
-//		int tokenOffset = partitionScanner.getTokenOffset();
-//		ITypedRegion partition = javaScriptDocumentPartitioner.getPartition(tokenOffset);
-//		ITypedRegion partition2 = javaScriptDocumentPartitioner.getPartition(partitionScanner.getTokenOffset());
-//		//System.out.println("[" + partition2.getOffset() + " - " + partition2.getLength() + "]");
-//				IDocument document = JavaScriptEditorPlugin.getDefault().getDocument();
-//		try {
-//			System.out.println(
-//			document.get(tokenOffset, partitionScanner.getTokenLength()));
-//		} catch (BadLocationException e) {
-//			e.printStackTrace();
-//		}
+// JavaScriptScanner partitionScanner =
+// JavaScriptEditorPlugin.getDefault().getPartitionScanner();
+// IDocumentPartitioner javaScriptDocumentPartitioner =
+// JavaScriptEditorPlugin.getDefault().getJavaScriptDocumentPartitioner();
+// int tokenOffset = partitionScanner.getTokenOffset();
+// ITypedRegion partition =
+// javaScriptDocumentPartitioner.getPartition(tokenOffset);
+// ITypedRegion partition2 =
+// javaScriptDocumentPartitioner.getPartition(partitionScanner.getTokenOffset());
+// //System.out.println("[" + partition2.getOffset() + " - " +
+// partition2.getLength() + "]");
+// IDocument document = JavaScriptEditorPlugin.getDefault().getDocument();
+// try {
+// System.out.println(
+// document.get(tokenOffset, partitionScanner.getTokenLength()));
+// } catch (BadLocationException e) {
+// e.printStackTrace();
+// }
 //		
 		return super.isDirty();
 	}
@@ -217,6 +239,26 @@ public class JavaScriptEditor extends TextEditor implements ErrorReporter {
 		} catch (CoreException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public Object getAdapter(Class clazz) {
+		if(IContentOutlinePage.class.equals(clazz)){
+			if(outlinePage == null){
+				outlinePage = new JavaScriptContentOutlinePage(getDocumentProvider(),this);
+				return outlinePage;
+			}
+		}
+		return super.getAdapter(clazz);
+	}
+
+	public ScriptOrFnNode getModel() {
+		return this.model;
+	}
+
+	public void setModel(ScriptOrFnNode node) {
+		this.model = model;
+		outlinePage.setInput(node);
 	}
 
 }

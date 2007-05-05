@@ -22,6 +22,7 @@ public class JavaScriptCompletionProcessor implements IContentAssistProcessor {
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
 			int offset) {
 		String prefix = stringUpto(viewer, Math.max(0, offset - 1));
+		prefix = prefix.trim();
 		System.out.println(prefix);
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		for (String proposalString : keywords) {

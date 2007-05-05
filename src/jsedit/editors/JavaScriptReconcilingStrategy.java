@@ -32,7 +32,7 @@ public class JavaScriptReconcilingStrategy implements IReconcilingStrategy {
 		Parser parser = new Parser(new CompilerEnvirons(), errorReporter);
 		try {
 			ScriptOrFnNode node = parser.parse(this.document.get(), null, 0);
-			//print(node);
+			((JavaScriptEditor)errorReporter).setModel(node);
 			((JavaScriptEditor)errorReporter).clearProblems();
 		} catch (EvaluatorException e) {
 			

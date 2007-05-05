@@ -3,10 +3,14 @@ package jsedit.editors;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.internal.ui.text.CombinedWordRule;
+import org.eclipse.jdt.ui.text.IJavaColorConstants;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.EndOfLineRule;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
@@ -35,6 +39,74 @@ public class  JavaScriptRuleScanner extends RuleBasedScanner{
 	private static String[] fgTypes= { "void", "boolean", "char", "byte", "short", "int", "long", "float", "double" }; //$NON-NLS-1$ //$NON-NLS-5$ //$NON-NLS-7$ //$NON-NLS-6$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-2$
 
 	private static String[] fgConstants= { "false", "null", "true" }; //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
+	
+	
+	
+//	@Override
+//	public IToken nextToken() {
+//		fTokenOffset= fOffset;
+//		fColumn= UNDEFINED;
+//		if (fRules != null) {
+//			for (int i= 0; i < fRules.length; i++) {
+//				IToken token= (fRules[i].evaluate(this));
+//				System.out.println(token.getData());
+//				if (!token.isUndefined())
+//					return token;
+//			}
+//		}
+//		if (read() == EOF)
+//			return Token.EOF;
+//		return fDefaultReturnToken;
+//	}
+
+	private static final class BracketRule implements IRule {
+
+		/** Java brackets */
+		private final char[] JAVA_BRACKETS= { '(', ')', '{', '}', '[', ']' };
+		/** Token to return for this rule */
+		private final IToken fToken;
+
+		/**
+		 * Creates a new bracket rule.
+		 *
+		 * @param token Token to use for this rule
+		 */
+		public BracketRule(IToken token) {
+			fToken= token;
+		}
+
+		/**
+		 * Is this character a bracket character?
+		 *
+		 * @param character Character to determine whether it is a bracket character
+		 * @return <code>true</code> iff the character is a bracket, <code>false</code> otherwise.
+		 */
+		public boolean isBracket(char character) {
+			for (int index= 0; index < JAVA_BRACKETS.length; index++) {
+				if (JAVA_BRACKETS[index] == character)
+					return true;
+			}
+			return false;
+		}
+
+		/*
+		 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
+		 */
+		public IToken evaluate(ICharacterScanner scanner) {
+
+			int character= scanner.read();
+			if (isBracket((char) character)) {
+				do {
+					character= scanner.read();
+				} while (isBracket((char) character));
+				scanner.unread();
+				return fToken;
+			} else {
+				scanner.unread();
+				return Token.UNDEFINED;
+			}
+		}
+	}
 
 	/**
 	 * Creates a Java code scanner with the given color provider.
@@ -43,26 +115,24 @@ public class  JavaScriptRuleScanner extends RuleBasedScanner{
 	 */
 	public JavaScriptRuleScanner() {
 
-		IToken keyword= new Token(new TextAttribute(getColor(KEYWORD),null,SWT.BOLD));
-		IToken type= new Token(new TextAttribute(getColor(TYPE),null,SWT.BOLD));
-		IToken string= new Token(new TextAttribute(getColor(STRING),null,SWT.BOLD));
-		IToken comment= new Token(new TextAttribute(getColor(SINGLE_LINE_COMMENT)));
-		IToken other= new Token(new TextAttribute(getColor(DEFAULT)));
+		Token keyword= new Token(new TextAttribute(getColor(KEYWORD),null,SWT.BOLD));
+		Token type= new Token(new TextAttribute(getColor(TYPE),null,SWT.BOLD));
+		Token string= new Token(new TextAttribute(getColor(STRING),null,SWT.BOLD));
+		Token comment= new Token(new TextAttribute(getColor(SINGLE_LINE_COMMENT)));
+		Token other= new Token(new TextAttribute(getColor(DEFAULT)));
+		Token bracket = new Token(new TextAttribute(getColor(KEYWORD)));
+		List<IRule> rules= new ArrayList<IRule>();
 
-		List rules= new ArrayList();
-
-		// Add rule for single line comments.
 		rules.add(new EndOfLineRule("//", comment)); //$NON-NLS-1$
 
-		// Add rule for strings and character constants.
-		rules.add(new SingleLineRule("\"", "\"", string, '\\')); //$NON-NLS-2$ //$NON-NLS-1$
-		rules.add(new SingleLineRule("'", "'", string, '\\')); //$NON-NLS-2$ //$NON-NLS-1$
+		rules.add(new SingleLineRule("\"", "\"", string, '\\')); 
+		rules.add(new SingleLineRule("'", "'", string, '\\')); 
+		rules.add(new MultiLineRule("/*","*/",string));
+		rules.add(new MultiLineRule("/* ","*/",string));
 
-		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new JavaScriptWhitespaceDetector()));
 
-		// Add word rule for keywords, types, and constants.
-		WordRule wordRule= new WordRule(new JavaScriptWordDetector(), other);
+		WordRule wordRule = new WordRule(new JavaScriptWordDetector(),other);
 		for (int i= 0; i < fgKeywords.length; i++)
 			wordRule.addWord(fgKeywords[i], keyword);
 		for (int i= 0; i < fgTypes.length; i++)
@@ -70,10 +140,13 @@ public class  JavaScriptRuleScanner extends RuleBasedScanner{
 		for (int i= 0; i < fgConstants.length; i++)
 			wordRule.addWord(fgConstants[i], type);
 		rules.add(wordRule);
+		
+		rules.add(new BracketRule(bracket));
 
 		IRule[] result= new IRule[rules.size()];
 		rules.toArray(result);
 		setRules(result);
+		setDefaultReturnToken(other);
 	}
 
 	private Color getColor(RGB rgb) {

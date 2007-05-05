@@ -86,6 +86,8 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 	
 	private static final ImageDescriptor imageDescriptor = ImageDescriptor.createFromFile(JavaScriptEditorPlugin.class, "checkout.gif");
 
+	public static final String FORMAT = JavaScriptEditorPlugin.class.getName() + ".format";
+
 	public ImageData getOverlayImageData(){
 		return imageDescriptor.getImageData();
 	}
@@ -112,22 +114,22 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 
 	public void setDocument(IDocument document) {
 		this.document = document;
-		IWorkbenchBrowserSupport browserSupport = getDefault().getWorkbench()
-				.getBrowserSupport();
-		IWebBrowser browser;
-		try {
-			if (browserSupport.isInternalWebBrowserAvailable()) {
-				browser = browserSupport.createBrowser(
-						WorkbenchBrowserSupport.AS_EDITOR
-								| WorkbenchBrowserSupport.LOCATION_BAR
-								| IWorkbenchBrowserSupport.NAVIGATION_BAR,
-						null, null, null);
-				URL findMorePluginsURL = new URL("http://localhost/jquery/mptest.py/index?url=http://www.google.com");
-				browser.openURL(findMorePluginsURL);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		IWorkbenchBrowserSupport browserSupport = getDefault().getWorkbench()
+//				.getBrowserSupport();
+//		IWebBrowser browser;
+//		try {
+//			if (browserSupport.isInternalWebBrowserAvailable()) {
+//				browser = browserSupport.createBrowser(
+//						WorkbenchBrowserSupport.AS_EDITOR
+//								| WorkbenchBrowserSupport.LOCATION_BAR
+//								| IWorkbenchBrowserSupport.NAVIGATION_BAR,
+//						null, null, null);
+//				URL findMorePluginsURL = new URL("http://localhost/jquery/mptest.py/index?url=http://www.google.com");
+//				browser.openURL(findMorePluginsURL);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	public IDocument getDocument() {

@@ -38,11 +38,11 @@ public class JavaScriptScanner extends RuleBasedPartitionScanner {
 
 		List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
 
-		rules.add(new SingleLineRule("\"","\"",doubleQuotes,'\\'));
-		rules.add(new SingleLineRule("'","'",singleQuotes,'\\'));
-		rules.add(new EndOfLineRule("//", singleLineComment));
-		rules.add(new MultiLineRule("/*", "*/", multiLineComment, (char) 0, true));
-		rules.add(new MultiLineRule("{", "}", block , (char) 0, true));
+//		rules.add(new SingleLineRule("\"","\"",doubleQuotes,'\\'));
+//		rules.add(new SingleLineRule("'","'",singleQuotes,'\\'));
+//		rules.add(new EndOfLineRule("//", singleLineComment));
+//		rules.add(new MultiLineRule("/*", "*/", multiLineComment, (char) 0, true));
+//		rules.add(new MultiLineRule("{", "}", block , (char) 0, true));
 
 		setPredicateRules(rules.toArray(new IPredicateRule[0]));
 	}

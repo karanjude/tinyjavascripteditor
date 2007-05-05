@@ -5,10 +5,15 @@ import jsedit.JavaScriptEditorPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.internal.ui.propertiesfileeditor.PropertyValueScanner.AssignmentDetector;
 import org.eclipse.jdt.internal.ui.text.JavaReconciler;
+import org.eclipse.jdt.internal.ui.text.comment.CommentFormattingStrategy;
+import org.eclipse.jdt.internal.ui.text.java.JavaFormattingStrategy;
+import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -75,7 +80,7 @@ public class JavaScriptSourceViewerCoinfiguration extends
 		return null;
 
 	}
-
+	
 	protected JavaScriptRuleScanner getTagScanner() {
 		return new JavaScriptRuleScanner();
 	}
@@ -88,7 +93,5 @@ public class JavaScriptSourceViewerCoinfiguration extends
 		assitant.setContentAssistProcessor(new JavaScriptCompletionProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
 		return assitant;
 	}
-	
-	
 
 }
