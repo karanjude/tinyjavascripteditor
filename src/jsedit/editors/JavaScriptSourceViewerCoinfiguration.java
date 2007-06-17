@@ -3,30 +3,20 @@ package jsedit.editors;
 import jsedit.JavaScriptEditorPlugin;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.internal.ui.propertiesfileeditor.PropertyValueScanner.AssignmentDetector;
-import org.eclipse.jdt.internal.ui.text.JavaReconciler;
-import org.eclipse.jdt.internal.ui.text.comment.CommentFormattingStrategy;
-import org.eclipse.jdt.internal.ui.text.java.JavaFormattingStrategy;
-import org.eclipse.jdt.ui.text.IJavaPartitions;
+import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
-import org.eclipse.jface.text.formatter.IContentFormatter;
-import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
-import org.eclipse.ui.texteditor.ContentAssistAction;
-
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 public class JavaScriptSourceViewerCoinfiguration extends
 		TextSourceViewerConfiguration {
@@ -44,6 +34,12 @@ public class JavaScriptSourceViewerCoinfiguration extends
 		return new JavaScriptAnnotationHover();
 	}
 
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+		IAutoEditStrategy strategy= (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) ? new JavaScriptAutoIndentStrategy() : new DefaultIndentLineAutoEditStrategy());
+		return new IAutoEditStrategy[] { strategy };
+	}
+	
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer,
 			String contentType, int stateMask) {

@@ -9,7 +9,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IDecoratorManager;
 
-
 public class JavaScriptLabelDecorator extends LabelProvider implements
 		ILabelDecorator {
 
@@ -18,7 +17,6 @@ public class JavaScriptLabelDecorator extends LabelProvider implements
 	public static JavaScriptLabelDecorator getJavaScriptLabelDecorator() {
 		IDecoratorManager decoratorManager = JavaScriptEditorPlugin
 				.getDefault().getWorkbench().getDecoratorManager();
-		
 
 		if (decoratorManager.getEnabled(ID)) {
 			return (JavaScriptLabelDecorator) decoratorManager
@@ -43,17 +41,23 @@ public class JavaScriptLabelDecorator extends LabelProvider implements
 
 	public void refresh() {
 		JavaScriptLabelDecorator javaScriptLabelDecorator = getJavaScriptLabelDecorator();
-		javaScriptLabelDecorator.fireLabelsChanged(new LabelProviderChangedEvent(javaScriptLabelDecorator,JavaScriptEditorPlugin.getDefault().getUpdatedResource()));
+		javaScriptLabelDecorator
+				.fireLabelsChanged(new LabelProviderChangedEvent(
+						javaScriptLabelDecorator, JavaScriptEditorPlugin
+								.getDefault().getUpdatedResource()));
 	}
 
 	private void fireLabelsChanged(
 			final LabelProviderChangedEvent labelProviderChangedEvent) {
-		Display.getDefault().asyncExec(new Runnable(){
+		Display.getDefault().asyncExec(new Runnable() {
 
 			public void run() {
-				fireLabelProviderChanged(labelProviderChangedEvent);
+				try {
+					fireLabelProviderChanged(labelProviderChangedEvent);
+				} catch (Exception e) {
+				}
 			}
-			
+
 		});
 	}
 }

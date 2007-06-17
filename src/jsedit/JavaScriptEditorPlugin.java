@@ -8,6 +8,8 @@ import java.util.List;
 import jsedit.editors.JavaScriptScanner;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
@@ -114,6 +116,7 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 
 	public void setDocument(IDocument document) {
 		this.document = document;
+		ToolBarManager toolbarManager = new ToolBarManager();
 //		IWorkbenchBrowserSupport browserSupport = getDefault().getWorkbench()
 //				.getBrowserSupport();
 //		IWebBrowser browser;

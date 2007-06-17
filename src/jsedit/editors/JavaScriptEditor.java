@@ -261,4 +261,10 @@ public class JavaScriptEditor extends TextEditor implements ErrorReporter {
 		outlinePage.setInput(node);
 	}
 
+	public void SetSeelected(int i, int j, boolean b) {
+		ISourceViewer sourceViewer = getSourceViewer();
+        sourceViewer.setSelectedRange(i, j);
+        sourceViewer.revealRange(i, j);
+	}
+
 }

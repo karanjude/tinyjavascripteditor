@@ -69,5 +69,81 @@
             </enabledWhen>
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="JSEdit.actionSet"
+            label="Sample Action Set"
+            visible="true">
+         <menu
+               id="sampleMenu"
+               label="Sample &amp;Menu">
+            <separator
+                  name="sampleGroup">
+            </separator>
+            <groupMarker
+                  name="group">
+            </groupMarker>
+         </menu>
+         <action
+               class="jsedit.actions.DummyAction"
+               icon="icons/sample.gif"
+               id="jsedit.actions.DummyAction"
+               label="&amp;Sample Action"
+               menubarPath="sampleMenu/sampleGroup"
+               toolbarPath="sampleGroup"
+               tooltip="Hello, Eclipse world">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="JSEdit.editorContribution2"
+            targetID="jsedit.editors.JavaScriptEditor">
+         <menu
+               id="xyz"
+               label="JSEDIT"
+               >
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+         <action
+               class="jSEdit.EditorActionDelegate2"
+               definitionId="JSEdit.command"
+               icon="icons/sample.gif"
+               id="JSEdit.action2"
+               label="action"
+               menubarPath="xyz/group1"
+               style="push"
+               toolbarPath="normal/additions">
+         </action>
+      </editorContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="JS Commands"
+            id="JSEdit.category"
+            name="JSCategory">
+      </category>
+      <command
+            category="JSEdit.category"
+            categoryId="JSEdit.category"
+            description="Yo my command"
+            id="JSEdit.command"
+            name="JSCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="JSEdit.command"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="JSEdit.key6"
+            sequence="M1+K">
+      </key>
+   </extension>
 
 </plugin>

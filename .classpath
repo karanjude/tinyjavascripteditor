@@ -5,6 +5,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="lib" path="lib/js.jar" sourcepath="D:/dev/3rd_party_libs/rhino/rhino1_6R3/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
