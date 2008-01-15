@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import jsedit.editors.JavaScriptEditor;
 import jsedit.editors.JavaScriptScanner;
 
 import org.eclipse.core.resources.IResource;
@@ -15,6 +16,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.osgi.framework.internal.core.ConsoleMsg;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.PartInitException;
@@ -71,6 +73,10 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
+	public void execute(String script) {
+		JavaScriptExecutor.execute(this, script);
+	}
+
 	/**
 	 * Returns the shared instance
 	 * 
@@ -85,15 +91,17 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 			javaScriptScanner = new JavaScriptScanner();
 		return javaScriptScanner;
 	}
-	
-	private static final ImageDescriptor imageDescriptor = ImageDescriptor.createFromFile(JavaScriptEditorPlugin.class, "checkout.gif");
 
-	public static final String FORMAT = JavaScriptEditorPlugin.class.getName() + ".format";
+	private static final ImageDescriptor imageDescriptor = ImageDescriptor
+			.createFromFile(JavaScriptEditorPlugin.class, "checkout.gif");
 
-	public ImageData getOverlayImageData(){
+	public static final String FORMAT = JavaScriptEditorPlugin.class.getName()
+			+ ".format";
+
+	public ImageData getOverlayImageData() {
 		return imageDescriptor.getImageData();
 	}
-	
+
 	public IDocumentPartitioner getJavaScriptDocumentPartitioner() {
 		if (javaScriptDocumentParitioner == null)
 			javaScriptDocumentParitioner = new FastPartitioner(
@@ -101,7 +109,7 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 					JavaScriptScanner.JAVA_SCRIPT_PARTITIONS);
 		return javaScriptDocumentParitioner;
 	}
-	
+
 	/**
 	 * Returns an image descriptor for the image file at the given plug-in
 	 * relative path
@@ -117,22 +125,23 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 	public void setDocument(IDocument document) {
 		this.document = document;
 		ToolBarManager toolbarManager = new ToolBarManager();
-//		IWorkbenchBrowserSupport browserSupport = getDefault().getWorkbench()
-//				.getBrowserSupport();
-//		IWebBrowser browser;
-//		try {
-//			if (browserSupport.isInternalWebBrowserAvailable()) {
-//				browser = browserSupport.createBrowser(
-//						WorkbenchBrowserSupport.AS_EDITOR
-//								| WorkbenchBrowserSupport.LOCATION_BAR
-//								| IWorkbenchBrowserSupport.NAVIGATION_BAR,
-//						null, null, null);
-//				URL findMorePluginsURL = new URL("http://localhost/jquery/mptest.py/index?url=http://www.google.com");
-//				browser.openURL(findMorePluginsURL);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		// IWorkbenchBrowserSupport browserSupport = getDefault().getWorkbench()
+		// .getBrowserSupport();
+		// IWebBrowser browser;
+		// try {
+		// if (browserSupport.isInternalWebBrowserAvailable()) {
+		// browser = browserSupport.createBrowser(
+		// WorkbenchBrowserSupport.AS_EDITOR
+		// | WorkbenchBrowserSupport.LOCATION_BAR
+		// | IWorkbenchBrowserSupport.NAVIGATION_BAR,
+		// null, null, null);
+		// URL findMorePluginsURL = new
+		// URL("http://localhost/jquery/mptest.py/index?url=http://www.google.com");
+		// browser.openURL(findMorePluginsURL);
+		// }
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	public IDocument getDocument() {
@@ -142,22 +151,22 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 	public void setJavaScriptParser(Parser parser) {
 		this.javaScriptParser = parser;
 	}
-	
-	public Parser getJavaScriptParser(){
+
+	public Parser getJavaScriptParser() {
 		return this.javaScriptParser;
 	}
 
-	private Hashtable<IResource,List<String>> tags = new Hashtable<IResource, List<String>>();
+	private Hashtable<IResource, List<String>> tags = new Hashtable<IResource, List<String>>();
 
 	private List<IResource> listOfResources = new ArrayList<IResource>();
 
-	private IResource updatedReource; 
-	
+	private IResource updatedReource;
+
 	public void addTag(IResource resource, String tag) {
-		if(tags.containsKey(resource)){
+		if (tags.containsKey(resource)) {
 			List<String> tagsForResource = tags.get(resource);
 			tagsForResource.add(tag);
-		}else{
+		} else {
 			List<String> tagsForResource = new ArrayList<String>();
 			tagsForResource.add(tag);
 			tags.put(resource, tagsForResource);
@@ -165,8 +174,8 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 	}
 
 	public List<String> getTags(IResource file) {
-		if(!tags.containsKey(file))
-				return new ArrayList<String>();
+		if (!tags.containsKey(file))
+			return new ArrayList<String>();
 		return tags.get(file);
 	}
 
@@ -178,5 +187,11 @@ public class JavaScriptEditorPlugin extends AbstractUIPlugin {
 		return updatedReource;
 	}
 
-	
+	/**
+	 * @param result
+	 */
+	public void print(Object result) {
+		ConsolePrinter.print(result);
+	}
+
 }

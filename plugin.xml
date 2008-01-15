@@ -145,5 +145,16 @@
             sequence="M1+K">
       </key>
    </extension>
+   <extension
+         id="error"
+         name="JavaScript Error"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="true">
+      </persistent>
+      <super
+            type="org.eclipse.jdt.core.problem">
+      </super>
+   </extension>
 
 </plugin>

@@ -9,6 +9,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -24,7 +26,8 @@ public class JavaScriptSourceViewerCoinfiguration extends
 	private ColorManager colorManager;
 	private JavaScriptEditor javaScriptEditor;
 
-	public JavaScriptSourceViewerCoinfiguration(ColorManager colorManager, JavaScriptEditor javaScriptEditor) {
+	public JavaScriptSourceViewerCoinfiguration(ColorManager colorManager,
+			JavaScriptEditor javaScriptEditor) {
 		this.colorManager = colorManager;
 		this.javaScriptEditor = javaScriptEditor;
 	}
@@ -34,12 +37,29 @@ public class JavaScriptSourceViewerCoinfiguration extends
 		return new JavaScriptAnnotationHover();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.ISourceViewer)
+	 */
 	@Override
-	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
-		IAutoEditStrategy strategy= (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) ? new JavaScriptAutoIndentStrategy() : new DefaultIndentLineAutoEditStrategy());
+	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
+		MultiPassContentFormatter formatter = new MultiPassContentFormatter(
+				getConfiguredDocumentPartitioning(sourceViewer),
+				IDocument.DEFAULT_CONTENT_TYPE);
+		formatter.setMasterStrategy(new JavaScriptFormattingStrategy());
+		return formatter;
+	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(
+			ISourceViewer sourceViewer, String contentType) {
+		IAutoEditStrategy strategy = (IDocument.DEFAULT_CONTENT_TYPE
+				.equals(contentType) ? new JavaScriptAutoIndentStrategy()
+				: new DefaultIndentLineAutoEditStrategy());
 		return new IAutoEditStrategy[] { strategy };
 	}
-	
+
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer,
 			String contentType, int stateMask) {
@@ -61,7 +81,8 @@ public class JavaScriptSourceViewerCoinfiguration extends
 	public IReconciler getReconciler(ISourceViewer sourceViewer) {
 		if (javaScriptEditor != null && javaScriptEditor.isEditable()) {
 
-			JavaScriptReconcilingStrategy javaScriptReconcilingStrategy = new JavaScriptReconcilingStrategy(javaScriptEditor);
+			JavaScriptReconcilingStrategy javaScriptReconcilingStrategy = new JavaScriptReconcilingStrategy(
+					javaScriptEditor);
 			javaScriptReconcilingStrategy.setDocument(JavaScriptEditorPlugin
 					.getDefault().getDocument());
 			MonoReconciler reconciler = new MonoReconciler(
@@ -76,7 +97,7 @@ public class JavaScriptSourceViewerCoinfiguration extends
 		return null;
 
 	}
-	
+
 	protected JavaScriptRuleScanner getTagScanner() {
 		return new JavaScriptRuleScanner();
 	}
@@ -86,7 +107,8 @@ public class JavaScriptSourceViewerCoinfiguration extends
 		ContentAssistant assitant = new ContentAssistant();
 		assitant.enableAutoActivation(true);
 		assitant.setAutoActivationDelay(100);
-		assitant.setContentAssistProcessor(new JavaScriptCompletionProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+		assitant.setContentAssistProcessor(new JavaScriptCompletionProcessor(),
+				IDocument.DEFAULT_CONTENT_TYPE);
 		return assitant;
 	}
 

@@ -6,17 +6,18 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
-import org.mozilla.javascript.CompilerEnvirons;
-import org.mozilla.javascript.ErrorReporter;
-import org.mozilla.javascript.EvaluatorException;
-import org.mozilla.javascript.Parser;
 
 public class JavaScriptDocumentProvider extends FileDocumentProvider {
 
-	public JavaScriptDocumentProvider() {
-		super();
+	private final JavaScriptEditor javaScriptEditor;
+
+
+	/**
+	 * @param javaScriptEditor
+	 */
+	public JavaScriptDocumentProvider(JavaScriptEditor javaScriptEditor) {
+		this.javaScriptEditor = javaScriptEditor;
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public class JavaScriptDocumentProvider extends FileDocumentProvider {
 			document.setDocumentPartitioner(documentPartitioner);
 			JavaScriptEditorPlugin.getDefault().setDocument(document);
 		}
-
+		javaScriptEditor.setDocument(document);
 		return document;
 	}
 

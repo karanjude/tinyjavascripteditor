@@ -1,7 +1,11 @@
 package jsedit.actions;
 
+import jsedit.JavaScriptEditorPlugin;
+import jsedit.editors.JavaScriptEditor;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -29,10 +33,12 @@ public class DummyAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		MessageDialog.openInformation(
-			window.getShell(),
-			"JSEdit Plug-in",
-			"Hello, Eclipse world");
+		IEditorPart activeEditor = window.getActivePage().getActiveEditor();
+		JavaScriptEditor javaScriptEditor = null;
+		if(activeEditor instanceof JavaScriptEditor){
+			javaScriptEditor = (JavaScriptEditor) activeEditor;
+		}
+		JavaScriptEditorPlugin.getDefault().execute(javaScriptEditor.script());
 	}
 
 	/**
